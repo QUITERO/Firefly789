@@ -1,74 +1,301 @@
 ---
 import { Icon } from "astro-icon/components";
-import I18nKey from "@/i18n/i18nKey";
-import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { url } from "@/utils/url-utils";
 ---
 
-<MainGridLayout title={i18n(I18nKey.notFound)} description={i18n(I18nKey.notFoundDescription)}>
-    <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-96">
-        <div class="card-base z-10 px-9 py-12 relative w-full flex flex-col items-center justify-center text-center">
-            <!-- 404 大号数字 -->
-            <div class="text-8xl md:text-9xl font-bold text-(--primary) opacity-20 mb-4">
-                {i18n(I18nKey.notFound)}
-            </div>
-            
-            <!-- 404 图标 -->
-            <div class="mb-6">
-                <Icon name="material-symbols:error-outline" class="text-6xl text-(--primary)" />
-            </div>
-            
-            <!-- 标题 -->
-            <div class="text-3xl md:text-4xl font-bold mb-4 text-90">
-                {i18n(I18nKey.notFoundTitle)}
-            </div>
-            
-            <!-- 描述 -->
-            <p class="text-lg text-75 mb-8 max-w-md">
-                {i18n(I18nKey.notFoundDescription)}
-            </p>
-            
-            <!-- 返回首页按钮 -->
-            <a 
-                href={url("/")}
-                class="inline-flex items-center gap-2 px-6 py-3 bg-(--primary) text-white rounded-(--radius-large) hover:bg-(--btn-content) transition-colors duration-200 font-medium"
-            >
-                <Icon name="material-symbols:home" class="text-xl" />
-                {i18n(I18nKey.backToHome)}
-            </a>
-            
-            <!-- 装饰性元素 -->
-            <div class="absolute top-4 left-4 opacity-10">
-                <Icon name="material-symbols:sentiment-sad" class="text-4xl text-(--primary)" />
-            </div>
-            <div class="absolute bottom-4 right-4 opacity-10">
-                <Icon name="material-symbols:search-off" class="text-4xl text-(--primary)" />
-            </div>
-        </div>
-    </div>
+<MainGridLayout
+	title="404 — Segmentation fault (core dumped)"
+	description="这个地址没有对应的页面，进程已异常终止。"
+>
+	<div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-96">
+		<div class="card-base z-10 w-full flex flex-col overflow-hidden text-left">
+			<!-- 终端标题栏 -->
+			<div class="terminal-bar">
+				<span class="dot dot-red"></span>
+				<span class="dot dot-amber"></span>
+				<span class="dot dot-cyan"></span>
+				<span class="terminal-bar-title">otaku@terminal-0x7f: ~</span>
+			</div>
+
+			<div class="terminal-body">
+				<!-- 大号 404 -->
+				<div class="glitch-404" data-text="404">404</div>
+
+				<!-- 模拟终端输出 -->
+				<div class="term-lines">
+					<p><span class="pfx">$</span> curl -s <span id="req-url">...</span></p>
+					<p><span class="pfx">$</span> ./open-page <span class="dim">--follow-redirects=false</span></p>
+					<p class="warn">Warning: no such route in <span class="dim">src/pages/</span></p>
+					<p class="crash">Segmentation fault (core dumped)</p>
+					<p class="dim">
+						core dumped to <span class="mono">/dev/null</span> ·
+						exit code <span class="mono">139</span> (SIGSEGV)
+					</p>
+				</div>
+
+				<!-- 说明与出口 -->
+				<p class="hint">
+					这条路由没有对应的页面，进程已异常终止。<br />
+					可能是链接打错了，也可能是文章被重命名或删掉了。
+				</p>
+
+				<div class="mt-2 flex flex-wrap items-center gap-3">
+					<a href={url("/")} class="term-btn term-btn-primary">
+						<Icon name="material-symbols:home" class="text-lg" />
+						<span>cd ~ （回首页）</span>
+					</a>
+					<a href={url("/archive/")} class="term-btn">
+						<Icon name="material-symbols:library-books" class="text-lg" />
+						<span>ls ./archive</span>
+					</a>
+					<a href={url("/search/")} class="term-btn">
+						<Icon name="material-symbols:search" class="text-lg" />
+						<span>grep 站内搜索</span>
+					</a>
+				</div>
+
+				<!-- 闪烁光标 -->
+				<p class="term-prompt">
+					<span class="pfx">$</span> <span class="caret"></span>
+				</p>
+			</div>
+		</div>
+	</div>
 </MainGridLayout>
 
+<script is:inline>
+	// 静态站点没法在服务端拿到请求路径，交给浏览器补上
+	(function () {
+		var el = document.getElementById("req-url");
+		if (!el) return;
+		el.textContent = location.origin + location.pathname + location.search;
+	})();
+</script>
+
 <style>
-    /* 添加一些动画效果 */
-    .card-base {
-        animation: fadeInUp 0.6s ease-out;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* 按钮悬停效果 */
-    a:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
-    }
+	/* 终端标题栏 */
+	.terminal-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.7rem 1rem;
+		background: rgba(0, 0, 0, 0.28);
+		border-bottom: 1px solid rgba(34, 230, 255, 0.14);
+	}
+
+	.dot {
+		width: 0.7rem;
+		height: 0.7rem;
+		border-radius: 9999px;
+		display: inline-block;
+	}
+	.dot-red {
+		background: #ff5f57;
+	}
+	.dot-amber {
+		background: #febc2e;
+	}
+	.dot-cyan {
+		background: #22e6ff;
+		box-shadow: 0 0 8px rgba(34, 230, 255, 0.8);
+	}
+
+	.terminal-bar-title {
+		margin-left: 0.5rem;
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+		opacity: 0.65;
+	}
+
+	.terminal-body {
+		padding: 1.75rem 1.75rem 2rem;
+		font-family: var(--font-code, ui-monospace, monospace);
+	}
+
+	/* 404 大数字 */
+	.glitch-404 {
+		position: relative;
+		display: inline-block;
+		font-size: clamp(4.5rem, 14vw, 8rem);
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		line-height: 1;
+		color: #22e6ff;
+		text-shadow:
+			0 0 18px rgba(34, 230, 255, 0.65),
+			0 0 60px rgba(34, 230, 255, 0.3);
+		margin-bottom: 1.25rem;
+	}
+
+	/* 用伪元素做 RGB 分离的抖动 */
+	.glitch-404::before,
+	.glitch-404::after {
+		content: attr(data-text);
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+	.glitch-404::before {
+		color: #ff2bd6;
+		animation: glitch-shift-a 3.2s steps(2, end) infinite;
+		mix-blend-mode: screen;
+	}
+	.glitch-404::after {
+		color: #7cf9ff;
+		animation: glitch-shift-b 2.6s steps(2, end) infinite;
+		mix-blend-mode: screen;
+	}
+
+	@keyframes glitch-shift-a {
+		0%,
+		92%,
+		100% {
+			transform: translate(0, 0);
+			opacity: 0;
+		}
+		93% {
+			transform: translate(-3px, 1px);
+			opacity: 0.8;
+		}
+		96% {
+			transform: translate(2px, -2px);
+			opacity: 0.6;
+		}
+	}
+
+	@keyframes glitch-shift-b {
+		0%,
+		88%,
+		100% {
+			transform: translate(0, 0);
+			opacity: 0;
+		}
+		90% {
+			transform: translate(3px, -1px);
+			opacity: 0.7;
+		}
+		94% {
+			transform: translate(-2px, 2px);
+			opacity: 0.5;
+		}
+	}
+
+	/* 终端行 */
+	.term-lines p {
+		margin: 0.2rem 0;
+		font-size: 0.9rem;
+		line-height: 1.6;
+		word-break: break-all;
+	}
+
+	.pfx {
+		color: #22e6ff;
+		margin-right: 0.35rem;
+		text-shadow: 0 0 8px rgba(34, 230, 255, 0.7);
+	}
+
+	.dim {
+		opacity: 0.55;
+	}
+
+	.mono {
+		opacity: 0.8;
+	}
+
+	.warn {
+		color: #febc2e;
+	}
+
+	.crash {
+		color: #ff2bd6;
+		font-weight: 700;
+		font-size: 1.15rem !important;
+		letter-spacing: 0.02em;
+		text-shadow: 0 0 16px rgba(255, 43, 214, 0.6);
+		margin-top: 0.5rem !important;
+	}
+
+	.hint {
+		margin-top: 1.5rem;
+		font-size: 0.9rem;
+		line-height: 1.7;
+		opacity: 0.75;
+		font-family: inherit;
+	}
+
+	/* 终端按钮 */
+	.term-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.55rem 0.95rem;
+		border-radius: 0.5rem;
+		font-size: 0.85rem;
+		border: 1px solid rgba(34, 230, 255, 0.28);
+		color: inherit;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease,
+			background 0.2s ease;
+	}
+
+	.term-btn:hover {
+		border-color: rgba(34, 230, 255, 0.7);
+		box-shadow: 0 0 18px -6px rgba(34, 230, 255, 0.8);
+		text-shadow: none;
+	}
+
+	.term-btn-primary {
+		background: rgba(34, 230, 255, 0.12);
+		border-color: rgba(34, 230, 255, 0.5);
+	}
+
+	/* 闪烁光标 */
+	.term-prompt {
+		margin-top: 1.25rem;
+		font-size: 0.9rem;
+	}
+
+	.caret {
+		display: inline-block;
+		width: 0.55rem;
+		height: 1.05rem;
+		vertical-align: -0.15rem;
+		background: #22e6ff;
+		box-shadow: 0 0 10px rgba(34, 230, 255, 0.9);
+		animation: caret-blink 1.05s steps(1, end) infinite;
+	}
+
+	@keyframes caret-blink {
+		0%,
+		49% {
+			opacity: 1;
+		}
+		50%,
+		100% {
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.glitch-404::before,
+		.glitch-404::after,
+		.caret {
+			animation: none;
+		}
+		.glitch-404::before,
+		.glitch-404::after {
+			opacity: 0;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.terminal-body {
+			padding: 1.25rem 1rem 1.5rem;
+		}
+		.term-lines p {
+			font-size: 0.8rem;
+		}
+	}
 </style>

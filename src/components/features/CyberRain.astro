@@ -1,0 +1,163 @@
+---
+// 赛博背景层：固定在最底层的「网格 + 代码雨」画布
+//
+// 层级说明：容器 z-index 取负值（--cyber-bg-z: -1），因此绘制在 <html> 背景色之上、
+// 所有正常流内容之下 —— 卡片会自然盖住它，视觉上就是「背景特效」。
+// 样式见 src/styles/cyber.css。
+//
+// 兼容 swup 换页：脚本会在每次换页后重跑，这里用 window 上的清理函数把上一次的
+// requestAnimationFrame 循环拆掉，避免多个循环叠加导致越来越卡。
+---
+
+<div class="cyber-bg" aria-hidden="true">
+	<div class="cyber-grid"></div>
+	<canvas class="cyber-rain" id="cyber-rain-canvas"></canvas>
+</div>
+
+<script>
+	type Cleanup = () => void;
+
+	const host = window as unknown as { __cyberRainCleanup?: Cleanup };
+
+	// 拆掉上一次的循环（swup 换页后重跑本脚本时）
+	if (typeof host.__cyberRainCleanup === "function") {
+		try {
+			host.__cyberRainCleanup();
+		} catch {
+			/* 上一次的实例已经失效，忽略 */
+		}
+		host.__cyberRainCleanup = undefined;
+	}
+
+	const canvas = document.getElementById(
+		"cyber-rain-canvas",
+	) as HTMLCanvasElement | null;
+	const ctx = canvas?.getContext("2d") ?? null;
+	const reduceMotion = window.matchMedia(
+		"(prefers-reduced-motion: reduce)",
+	).matches;
+
+	if (canvas && ctx && !reduceMotion) {
+		// 全角片假名 + 半角英文符号，混一点代码符号更有「终端感」
+		const GLYPHS =
+			"アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン" +
+			"ｦｧｨｩｪｫｬｭｮｯｰ0123456789{}[]<>/\\|=+*#$%&_~^;:";
+
+		const isMobile = window.matchMedia("(max-width: 767px)").matches;
+		const FONT_SIZE = isMobile ? 17 : 15;
+		const FRAME_MS = isMobile ? 1000 / 16 : 1000 / 26;
+		const FADE = isMobile ? 0.12 : 0.085;
+
+		const CYAN = "rgba(34, 230, 255, 0.85)";
+		const CYAN_DIM = "rgba(34, 230, 255, 0.5)";
+		const MAGENTA = "rgba(255, 43, 214, 0.8)";
+		const WHITE = "rgba(220, 255, 255, 0.95)";
+
+		let width = 0;
+		let height = 0;
+		let cols = 0;
+		let drops: number[] = [];
+		let raf = 0;
+		let last = 0;
+		let alive = true;
+
+		const setup = () => {
+			const dpr = Math.min(window.devicePixelRatio || 1, 2);
+			width = window.innerWidth;
+			height = window.innerHeight;
+
+			canvas.width = Math.floor(width * dpr);
+			canvas.height = Math.floor(height * dpr);
+			canvas.style.width = `${width}px`;
+			canvas.style.height = `${height}px`;
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`;
+			ctx.textBaseline = "top";
+
+			cols = Math.ceil(width / FONT_SIZE);
+			drops = new Array<number>(cols);
+			for (let i = 0; i < cols; i++) {
+				// 初始位置随机散布在屏幕外，避免开场整齐划一地同时落
+				drops[i] = -Math.random() * (height / FONT_SIZE);
+			}
+
+			ctx.clearRect(0, 0, width, height);
+		};
+
+		const draw = () => {
+			// 半透明深色矩形做拖尾淡出。画布是 mix-blend-mode: screen，
+			// 深色在此模式下几乎不显影，所以不会把页面背景压暗。
+			ctx.fillStyle = `rgba(5, 7, 15, ${FADE})`;
+			ctx.fillRect(0, 0, width, height);
+
+			for (let i = 0; i < cols; i++) {
+				const x = i * FONT_SIZE;
+				const y = drops[i] * FONT_SIZE;
+
+				// 头部字符更亮，偶尔换成品红/白色，形成「高亮字符」
+				const glyph = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+				const roll = Math.random();
+				ctx.fillStyle = roll > 0.965 ? WHITE : roll > 0.9 ? MAGENTA : CYAN;
+				ctx.fillText(glyph, x, y);
+
+				// 上一行留一个暗一点的残影，视觉上更像有尾巴
+				if (roll > 0.6) {
+					ctx.fillStyle = CYAN_DIM;
+					ctx.fillText(glyph, x, y - FONT_SIZE);
+				}
+
+				drops[i] += 1;
+
+				// 落到屏幕外后，从顶部重新开始；小概率额外归零，形成长短不一的列
+				if (y > height && Math.random() > 0.975) {
+					drops[i] = -Math.random() * 12;
+				}
+			}
+		};
+
+		const loop = (now: number) => {
+			if (!alive) return;
+			raf = requestAnimationFrame(loop);
+			if (now - last < FRAME_MS) return;
+			last = now;
+			draw();
+		};
+
+		const start = () => {
+			if (raf) return;
+			last = 0;
+			raf = requestAnimationFrame(loop);
+		};
+
+		const stop = () => {
+			if (raf) cancelAnimationFrame(raf);
+			raf = 0;
+		};
+
+		// 窗口尺寸变化：防抖重建列阵
+		let resizeTimer = 0;
+		const onResize = () => {
+			window.clearTimeout(resizeTimer);
+			resizeTimer = window.setTimeout(setup, 200);
+		};
+
+		// 切到后台标签页时暂停，省 CPU
+		const onVisibility = () => {
+			if (document.hidden) stop();
+			else start();
+		};
+
+		setup();
+		start();
+		window.addEventListener("resize", onResize);
+		document.addEventListener("visibilitychange", onVisibility);
+
+		host.__cyberRainCleanup = () => {
+			alive = false;
+			stop();
+			window.clearTimeout(resizeTimer);
+			window.removeEventListener("resize", onResize);
+			document.removeEventListener("visibilitychange", onVisibility);
+		};
+	}
+</script>

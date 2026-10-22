@@ -4,6 +4,7 @@ import La51Analytics from "@components/analytics/La51Analytics.astro";
 import MicrosoftClarity from "@components/analytics/MicrosoftClarity.astro";
 import UmamiAnalytics from "@components/analytics/UmamiAnalytics.astro";
 import CodeGroupManager from "@components/features/CodeGroupManager.astro";
+import CyberRain from "@components/features/CyberRain.astro";
 import FancyboxManager from "@components/features/FancyboxManager.astro";
 import FontSetup from "@components/features/FontSetup.astro";
 import GithubCardManager from "@components/features/GithubCardManager.astro";
@@ -563,6 +564,9 @@ const ogImageAlt = propsOgImageAlt ?? pageTitle;
       <MusicPlayerView />
     )}
 
+
+    <!-- 赛博背景层：网格 + 代码雨（z-index 为负，位于所有内容之下） -->
+    <CyberRain />
 
     <!-- Sakura Effect -->
     <SakuraEffect />
