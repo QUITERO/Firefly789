@@ -47,3 +47,6 @@ package/
 .codex*
 .claude
 .mimocode
+
+# local dev log
+dev.log
