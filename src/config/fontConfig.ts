@@ -26,32 +26,52 @@ import type { FontDefinition, FontSelectionConfig } from "@/types/fontConfig";
 // ─── Astro Font API 字体定义 ───────────────────────────────
 // 适用于 Astro Font API 的字体配置，支持自动下载、缓存和优化加载
 // 本地开发调试的情况下，修改后需要每次重启开发服务器才能生效
+//
+// 注意：这里三个字体已从 fontsource 在线源改为「本地文件」。
+// 原因：fontsource provider 会从 cdn.jsdelivr.net 拉取 woff2，国内网络下会直接
+// 报 CannotFetchFontFile 导致 pnpm dev / pnpm build 失败。改成本地文件后
+// 不再依赖任何 CDN，构建更快也更稳。字体文件在 public/assets/fonts/。
+// 想换回在线源：把 provider 改回 "fontsource"，并删掉 options 即可。
 export const fontsList: FontDefinition[] = [
 	{
 		name: "Zen Maru Gothic",
 		cssVariable: "--font-zen-maru-gothic",
-		provider: "fontsource",
-		weights: ["300", "400", "500", "600", "700"],
-		styles: ["normal"],
-		subsets: ["latin", "cyrillic"],
+		provider: "local",
+		options: {
+			variants: [
+				{ src: ["./public/assets/fonts/zen-maru-gothic-300.woff2"], weight: "300", style: "normal" },
+				{ src: ["./public/assets/fonts/zen-maru-gothic-400.woff2"], weight: "400", style: "normal" },
+				{ src: ["./public/assets/fonts/zen-maru-gothic-500.woff2"], weight: "500", style: "normal" },
+				{ src: ["./public/assets/fonts/zen-maru-gothic-700.woff2"], weight: "700", style: "normal" },
+			],
+		},
 		fallbacks: ["sans-serif"],
 	},
 	{
 		name: "Inter",
 		cssVariable: "--font-inter",
-		provider: "fontsource",
-		weights: ["300", "400", "500", "600", "700"],
-		styles: ["normal"],
-		subsets: ["latin", "cyrillic"],
+		provider: "local",
+		options: {
+			variants: [
+				{ src: ["./public/assets/fonts/inter-300.woff2"], weight: "300", style: "normal" },
+				{ src: ["./public/assets/fonts/inter-400.woff2"], weight: "400", style: "normal" },
+				{ src: ["./public/assets/fonts/inter-500.woff2"], weight: "500", style: "normal" },
+				{ src: ["./public/assets/fonts/inter-600.woff2"], weight: "600", style: "normal" },
+				{ src: ["./public/assets/fonts/inter-700.woff2"], weight: "700", style: "normal" },
+			],
+		},
 		fallbacks: ["sans-serif"],
 	},
 	{
 		name: "JetBrains Mono",
 		cssVariable: "--font-jetbrains-mono",
-		provider: "fontsource",
-		weights: ["400", "700"],
-		styles: ["normal"],
-		subsets: ["latin", "cyrillic"],
+		provider: "local",
+		options: {
+			variants: [
+				{ src: ["./public/assets/fonts/jetbrains-mono-400.woff2"], weight: "400", style: "normal" },
+				{ src: ["./public/assets/fonts/jetbrains-mono-700.woff2"], weight: "700", style: "normal" },
+			],
+		},
 		fallbacks: [
 			"ui-monospace",
 			"SFMono-Regular",

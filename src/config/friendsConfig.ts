@@ -21,33 +21,24 @@ export const friendsPageConfig: FriendsPageConfig = {
 };
 
 // 友链配置
+// 交到朋友后照着下面的格式往里加就行，enabled 为 false 时不显示：
+// {
+// 	title: "对方站名",
+// 	imgurl: "对方头像直链",
+// 	desc: "一句话描述",
+// 	siteurl: "https://对方域名",
+// 	tags: ["Blog"],
+// 	weight: 10, // 权重，数字越大排序越靠前
+// 	enabled: true, // 是否启用
+// },
 export const friendsConfig: FriendLink[] = [
 	{
-		title: "夏夜流萤",
-		imgurl:
-			"https://weavatar.com/avatar/d252655d40d6874417a720bad0a6c5f77f8f6a1fd2f882f8f338402dc37e4190?s=640",
-		desc: "飞萤之火自无梦的长夜亮起，绽放在终竟的明天。",
-		siteurl: "https://blog.cuteleaf.cn",
-		tags: ["Blog"],
-		weight: 10, // 权重，数字越大排序越靠前
-		enabled: true, // 是否启用
-	},
-	{
-		title: "Firefly Docs",
+		title: "Firefly",
 		imgurl: "https://docs-firefly.cuteleaf.cn/logo.png",
-		desc: "Firefly主题模板文档",
-		siteurl: "https://docs-firefly.cuteleaf.cn",
-		tags: ["Docs"],
-		weight: 9,
-		enabled: true,
-	},
-	{
-		title: "Astro",
-		imgurl: "https://avatars.githubusercontent.com/u/44914786?v=4&s=640",
-		desc: "The web framework for content-driven websites. ⭐️ Star to support our work!",
-		siteurl: "https://github.com/withastro/astro",
-		tags: ["Framework"],
-		weight: 8,
+		desc: "本站使用的 Astro 博客主题",
+		siteurl: "https://github.com/CuteLeaf/Firefly",
+		tags: ["主题"],
+		weight: 1,
 		enabled: true,
 	},
 ];
