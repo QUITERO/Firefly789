@@ -1,8 +1,8 @@
 {
+	// Cloudflare Pages 项目配置（直传模式）
+	// 部署：pnpm deploy  →  pnpm build && wrangler pages deploy dist --project-name firefly
+	// 注意：这是 Pages，不是 Workers —— 用 pages_build_output_dir，不要用 assets（那是 Workers 静态资源的写法）
 	"name": "firefly",
-	"compatibility_date": "2025-01-01",
-	"compatibility_flags": ["nodejs_compat"],
-	"assets": {
-		"directory": "./dist"
-	}
+	"pages_build_output_dir": "./dist",
+	"compatibility_date": "2025-01-01"
 }
