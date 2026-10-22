@@ -48,7 +48,7 @@ export const siteConfig: SiteConfig = {
 	subtitle: "Terminal 0x7F",
 
 	// 站点 URL
-	site_url: "https://blog.080124.xyz",
+	site_url: "https://080124.xyz",
 
 	// 站点描述
 	description:

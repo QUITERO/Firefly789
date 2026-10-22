@@ -11,6 +11,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
+import keystatic from "@keystatic/astro"; /* 本地内容编辑后台（仅 dev） */
 import { pluginLanguageLogo } from "ec-lang-logo"; /* Language Logo */
 import { pluginCollapsible } from "expressive-code-collapsible"; /* Collapsible */
 import { pluginLanguageBadge } from "expressive-code-language-badge"; /* Language Badge */
@@ -64,6 +65,10 @@ const adapter = process.env.CF_WORKERS
 			prerenderEnvironment: "node",
 		})
 	: undefined;
+
+// Keystatic 后台只在 `pnpm dev` 时挂载；生产构建不引入，零影响
+const keystaticIntegrations =
+	process.env.NODE_ENV === "development" ? [keystatic()] : [];
 
 // https://astro.build/config
 export default defineConfig({
@@ -282,6 +287,7 @@ export default defineConfig({
 			},
 		}),
 		mdx(),
+		...keystaticIntegrations,
 	],
 	markdown: {
 		processor: unified({
@@ -352,12 +358,26 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		// Keystatic 后台（仅 dev）用的是 React 19 的 CJS 入口，
+		// 不预打包的话浏览器里会报 "does not provide an export named 'jsx'"
+		optimizeDeps: {
+			include: [
+				"react",
+				"react/jsx-runtime",
+				"react/jsx-dev-runtime",
+				"react-dom",
+				"react-dom/client",
+			],
+		},
 		server: {
 			watch: {
 				ignored: ["**/package/**", "**/Firefly-docs/**"],
 			},
 		},
 		resolve: {
+			// Keystatic 从 pnpm store 里会解析到另一份 react，
+			// 不 dedupe 的话 optimizeDeps 的预打包替换不上，浏览器就报 jsx 导出缺失
+			dedupe: ["react", "react-dom"],
 			alias: {
 				"@rehype-callouts-theme": `rehype-callouts/theme/${siteConfig.post.rehypeCallouts.theme}`,
 			},
