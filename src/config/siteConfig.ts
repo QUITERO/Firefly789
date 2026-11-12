@@ -42,20 +42,20 @@ const pages = resolvePageToggles({
 
 export const siteConfig: SiteConfig = {
 	// 站点标题
-	title: "次元代码终端",
+	title: "AeroCoder",
 
 	// 站点副标题
-	subtitle: "Terminal 0x7F",
+	subtitle: "Explore Drones, AI, and Coding",
 
 	// 站点 URL
 	site_url: "https://080124.xyz",
 
 	// 站点描述
 	description:
-		"Otaku 的个人博客 —— 次元代码终端 Terminal 0x7F。这里记录代码、二次元与折腾过程的碎片，偶尔写点技术笔记和日常随想。",
+		"Otaku 的个人博客 —— 次元代码终端 Terminal 0x7F。",
 
 	// 站点关键词
-	keywords: ["次元代码终端", "Terminal 0x7F", "Otaku", "博客", "技术博客", "代码", "ACGN"],
+	keywords: ["次元代码终端", "Terminal 0x7F", "博客", "技术博客", "代码", "ACGN"],
 
 
 	// 主题色
@@ -111,7 +111,7 @@ export const siteConfig: SiteConfig = {
 			alt: "🍀",
 		},
 		// 导航栏标题
-		title: "次元代码终端",
+		title: "AeroCoder",
 		// 全宽导航栏，导航栏是否占满屏幕宽度
 		widthFull: false,
 		// 导航菜单对齐方式，left：左对齐，center：居中

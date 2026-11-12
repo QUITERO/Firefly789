@@ -2,17 +2,17 @@ import type { ProfileConfig } from "../types/profileConfig";
 
 export const profileConfig: ProfileConfig = {
 	// 头像
-	// 图片路径支持三种格式：
+	// 图片路径支持三种格式:
 	// 1. public 目录（以 "/" 开头，不优化）："/assets/images/avatar.webp"
 	// 2. src 目录（不以 "/" 开头，自动优化但会增加构建时间，推荐）："assets/images/avatar.webp"
 	// 3. 远程 URL："https://example.com/avatar.jpg"
 	avatar: "assets/images/avatar.avif",
 
 	// 名字
-	name: "Otaku",
+	name: "Void",
 
 	// 个人签名
-	bio: "在终端里追番，在代码里造次元。",
+	bio: "Breaking the loops,defining the logic.",
 
 	// 链接配置
 	// 已经预装的图标集：fa7-brands，fa7-regular，fa7-solid，material-symbols，simple-icons
